@@ -1,8 +1,6 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-// @ts-ignore
-// eslint-disable-next-line no-unused-vars
 import locatecontrol from 'leaflet.locatecontrol'
 
 // @ts-ignore

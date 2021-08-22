@@ -112,7 +112,6 @@ function createPolyline(line:L.LatLngExpression[], conditions: Object, side: str
         {
             // @ts-ignore
             color: getColor(conditions?.default),
-            // @ts-ignore
             weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
             // @ts-ignore
             offset: side === 'right' ? offset : -offset,
@@ -241,10 +240,9 @@ export function updateLaneStylesByZoom(lanes: any, zoom: number) {
 
         const sideOffset = lanes[lane].options.offset > 0 ? 1 : -1
         const isMajor = lanes[lane].options.isMajor
-        // @ts-ignore
         const offset = isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor
-        // @ts-ignore
         const weight = isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor
+        // @ts-ignore
         lanes[lane].setOffset(sideOffset * offset)
         lanes[lane].setStyle({ weight })
     }
