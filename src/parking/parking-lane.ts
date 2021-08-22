@@ -8,8 +8,9 @@ const highwayRegex = /'^motorway|trunk|primary|secondary|tertiary|unclassified|r
 export function parseParkingLane(way, nodes, zoom, editorMode) {
     const isMajor = wayIsMajor(way.tags)
 
-    if (typeof isMajor !== 'boolean')
+    if (typeof isMajor !== 'boolean') {
         return
+    }
 
     const polyline = way.nodes.map(x => nodes[x])
     let emptyway = true

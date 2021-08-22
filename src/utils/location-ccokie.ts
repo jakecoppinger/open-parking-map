@@ -1,4 +1,4 @@
-export function setLocationToCookie(center, zoom) {
+export function setLocationToCookie(center:L.LatLng, zoom: number) {
     const date = new Date(new Date().getTime() + 10 * 365 * 24 * 60 * 60 * 1000)
     document.cookie = 'location=' + zoom + '/' + center.lat + '/' + center.lng + '; expires=' + date
 }
