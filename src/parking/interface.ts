@@ -178,7 +178,7 @@ async function downloadParkinkLanes(map: L.Map) {
     }
 }
 
-function addNewLanes(newLanes: {}, map: L.Map) {
+function addNewLanes(newLanes: any, map: L.Map) {
     updateLaneColorsByDate(newLanes, datetime)
     Object.assign(lanes, newLanes)
     for (const newLane of Object.values(newLanes)) {
@@ -243,7 +243,7 @@ function handleMapMoveEnd() {
 
     const zoom = map.getZoom()
     setLocationToCookie(map.getCenter(), zoom)
-
+    
     updateLaneStylesByZoom(lanes, zoom);
 
     (document.getElementById('min-zoom-btn') as HTMLButtonElement).style.display =
@@ -308,6 +308,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
 }
 
 function handleOsmChange(newOsm: any) {
+    // @ts-ignore
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
 

@@ -5,3 +5,9 @@ interface GlobalState {
 }
 
 export type OurWindow = Window & GlobalState & typeof globalThis;
+
+
+export interface ConditionsInterface {
+  intervals: any[],
+  default: any
+}
