@@ -11,3 +11,11 @@ export interface ConditionsInterface {
   intervals: any[],
   default: any
 }
+
+export interface StyleMapInterface {
+  weightMinor?: number;
+  weightMajor?: number;
+
+  offsetMajor?: number;
+  offsetMinor?: number;
+}
