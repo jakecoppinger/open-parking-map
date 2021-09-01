@@ -1,5 +1,5 @@
 [Open Parking Map](https://openparkingmap.com)
-================
+==================
 
 Shows parking restrictions on streets in OpenStreetMap.
 
