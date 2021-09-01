@@ -54,12 +54,13 @@ const laneInfoControl = new LaneInfoControl({ position: 'topright' })
 const tileLayers = {
     mapnik: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18,
+        maxZoom: 21,
+        maxNativeZoom: 18,
         className: 'mapnik_gray',
     }),
     esri: L.tileLayer('https://clarity.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         attribution: "<a href='https://wiki.openstreetmap.org/wiki/Esri'>Terms & Feedback</a>",
-        maxZoom: 19,
+        maxZoom: 21,
         maxNativeZoom: 19,
         ref: 'esric',
     }),

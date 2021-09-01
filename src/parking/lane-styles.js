@@ -28,7 +28,7 @@ function generateStyleMapByZoom() {
             map[zoom].weightMajor = 3
             map[zoom].offsetMinor = 3
             map[zoom].weightMinor = 1.5
-        } else if (zoom >= 18) {
+        } else {
             map[zoom].offsetMajor = 8
             map[zoom].weightMajor = 3
             map[zoom].offsetMinor = 3
