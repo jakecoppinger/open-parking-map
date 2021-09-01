@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import debounce from 'lodash/debounce'
 
 // eslint-disable-next-line no-unused-vars
 import locatecontrol from 'leaflet.locatecontrol'
@@ -100,6 +101,7 @@ export function initMap() {
     laneInfoControl.addTo(map)
         .setOsmChangeListener(handleOsmChange)
 
+    map.on('movestart', handleMapMoveStart)
     map.on('moveend', handleMapMoveEnd)
     map.on('click', closeLaneInfo)
 
@@ -206,27 +208,14 @@ function closeLaneInfo(e) {
     lanes.left?.remove()
 }
 
-function debounce(func, wait, immediate) {
-    let timeout
-    return function() {
-        const context = this
-        const args = arguments
-
-        const callNow = immediate && !timeout
-
-        clearTimeout(timeout)
-        timeout = setTimeout(function() {
-            timeout = null
-            if (!immediate)
-                func.apply(context, args)
-        }, wait)
-        if (callNow) func.apply(context, args)
-    }
-}
-
 // Reduce strain on the overpass turbo API!
-const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 5000, true)
+const debouncedDownloadParkingLanes = debounce(downloadParkinkLanes, 1500, {
+    trailing: true,
+})
 
+function handleMapMoveStart() {
+    debouncedDownloadParkingLanes.cancel()
+}
 // Map move handler
 function handleMapMoveEnd() {
     document.getElementById('ghc-josm').href = josmUrl + overpassUrl + getHighwaysOverpassQuery()
