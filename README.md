@@ -14,9 +14,7 @@ their hard work.
 ![Screenshot of Sydney Central & Refern](/screenshots/redfern-and-central-screenshot-sep-21.jpg?raw=true)
 
 See their original [launch post on OSM](https://www.openstreetmap.org/user/acsd/diary/45026), and
-their deployment of the viewer at
-[https://zlant.github.io/parking-lanes/#16/52.4751/13.4435]
-(https://zlant.github.io/parking-lanes/#16/52.4751/13.4435).
+their deployment of the viewer at [https://zlant.github.io/parking-lanes/#16/52.4751/13.4435](https://zlant.github.io/parking-lanes/#16/52.4751/13.4435).
 
 # Updating the map
 

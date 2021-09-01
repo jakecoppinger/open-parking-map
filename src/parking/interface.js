@@ -20,6 +20,7 @@ import { hyper } from 'hyperhtml/esm'
 
 import DatetimeControl from './controls/datetime'
 import GithubControl from './controls/github'
+import AuthorControl from './controls/author'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/lane-info'
 
@@ -88,7 +89,8 @@ export function initMap() {
 
     new GithubControl({ position: 'bottomright' }).addTo(map)
         .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
-    new LegendControl({ position: 'bottomright' }).addTo(map)
+    new AuthorControl({ position: 'bottomleft' }).addTo(map)
+    new LegendControl({ position: 'bottomleft' }).addTo(map)
     new DatetimeControl({ position: 'topright' }).addTo(map)
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)
