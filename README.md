@@ -10,6 +10,10 @@ Originally built by [zlant (GitHub)](https://github.com/zlant/) /
 deployed to this website to attract more users and made other small changes, but it's really all
 their hard work.
 
+![Screenshot of Berlin](/screenshots/berlin-screenshot-sep-21.jpg?raw=true)
+
+![Screenshot of Sydney Central & Refern](/screenshots/redfern-and-central-screenshot-sep-21.jpg?raw=true)
+
 See their original [launch post on OSM](https://www.openstreetmap.org/user/acsd/diary/45026), and
 their deployment of the viewer at
 [https://zlant.github.io/parking-lanes/#16/52.4751/13.4435]
@@ -19,6 +23,8 @@ their deployment of the viewer at
 
 Click the `Editor` button in the bottom right. It will take some time to load the data using
 Overpass turbo.
+
+![Screenshot of Refern](/screenshots/redfern-screenshot-sep-21.jpg?raw=true)
 
 # Troubleshooting
 If the map data isn't loading, either there is no data for your location or Overpass Turbo isn't
