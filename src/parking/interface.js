@@ -77,8 +77,10 @@ export function initMap() {
     const root = document.querySelector('#map')
     map = L.map(root, { fadeAnimation: false })
 
+    const redfernCoordinates = [-33.89184, 151.20283]
+    const defaultZoom = 17
     if (document.location.href.indexOf('#') === -1)
-        map.setView(...(getLocationFromCookie() || [[51.591, 24.609], 5]))
+        map.setView(...(getLocationFromCookie() || [redfernCoordinates, defaultZoom]))
 
     tileLayers.mapnik.addTo(map)
 
