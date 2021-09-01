@@ -89,7 +89,8 @@ function createChangeset(editorName, editorVersion) {
                 $generator: editorName,
                 tag: [
                     { $k: 'created_by', $v: `${editorName} ${editorVersion}` },
-                    { $k: 'comment', $v: 'Parking lanes' },
+                    { $k: 'comment', $v: 'Edit parking lanes using openparkingmap.com' },
+                    { $k: 'hashtags', $v: '#openparkingmap' },
                 ],
             },
         },

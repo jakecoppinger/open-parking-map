@@ -40,8 +40,8 @@ import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '~/src/utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '~/src/utils/osm-client'
 
-const editorName = 'PLanes'
-const version = '0.4.2'
+const editorName = 'OpenParkingMap.com'
+const version = '0.1.0'
 
 /** @type {L.Map} */
 let map = null
