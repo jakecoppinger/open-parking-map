@@ -5,8 +5,7 @@ Shows parking restrictions on streets in OpenStreetMap.
 
 Live at [OpenParkingMap.com](https://openparkingmap.com)
 
-Originally built by [zlant (GitHub)](https://github.com/zlant/) /
-[acsd (OSM)](https://www.openstreetmap.org/user/acsd/). I've added Australian parking signs,
+Originally built by [zlant (GitHub)](https://github.com/zlant/) / [acsd (OSM)](https://www.openstreetmap.org/user/acsd/). I've added Australian parking signs,
 deployed to this website to attract more users and made other small changes, but it's really all
 their hard work.
 
@@ -44,16 +43,6 @@ Geolocation won't work over http. [ngrok](https://ngrok.com/docs) can start an H
 localhost with the following command:
 
 `ngrok http --host-header=rewrite 33444`
-
-## Screenshots
-
-Viewer: 
-
-<img src="https://i.imgur.com/VwH7Hmh.png" alt="Viewer UI">
-
-Editor:
-
-<img src="https://i.imgur.com/e0vsqUQ.png" alt="Editor UI">
 
 # License
 MIT
