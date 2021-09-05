@@ -12,7 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "strictNullChecks": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots" : ["node_modules/@types", "src/types"]
   },
-  "include": ["src/parking/*.ts", "src/utils/*.ts"]
+  "include": ["src/parking/*.ts", "src/utils/*.ts", "src/types/images.d.ts"]
 }
