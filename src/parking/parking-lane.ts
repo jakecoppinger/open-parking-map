@@ -242,9 +242,19 @@ export function updateLaneStylesByZoom(lanes: any, zoom: number) {
         const isMajor = lanes[lane].options.isMajor
         const offset = isMajor ? laneStyle[zoom].offsetMajor : laneStyle[zoom].offsetMinor
         const weight = isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor
-        // @ts-ignore
-        lanes[lane].setOffset(sideOffset * offset)
-        lanes[lane].setStyle({ weight })
+        
+        if(offset !== undefined) {
+            if(lanes[lane] !== undefined && lanes[lane].setOffset) {
+                lanes[lane].setOffset(sideOffset * offset)
+                lanes[lane].setStyle({ weight })
+            } else {
+                console.error(`lanes[${lane}] is bad`)
+                console.log(lanes[lane])
+            }
+        } else {
+            console.error("Offset is undefined!")
+        }
+
     }
 }
 

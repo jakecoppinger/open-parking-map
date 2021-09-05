@@ -19,3 +19,8 @@ export interface StyleMapInterface {
   offsetMajor?: number;
   offsetMinor?: number;
 }
+
+export interface LocationAndZoom {
+  location: L.LatLng,
+  zoom: number
+}

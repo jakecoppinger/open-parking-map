@@ -10,10 +10,12 @@ import polylineoffset from 'leaflet-polylineoffset'
 // @ts-ignore
 // eslint-disable-next-line no-unused-vars
 import leaflethash from 'leaflet-hash'
+// leaflethash
 
 // @ts-ignore
 // eslint-disable-next-line no-unused-vars
 import leaflettouchhelper from 'leaflet-touch-helper'
+leaflettouchhelper
 
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'font-awesome/css/font-awesome.min.css'
@@ -81,16 +83,21 @@ export function initMap() {
 
     if (document.location.href.indexOf('#') === -1) {
         const cookieLocation = getLocationFromCookie();
-        const defaultLocation = [[51.591, 24.609], 5]
-        const location = [...(cookieLocation || defaultLocation)]
-        // @ts-ignore
-        map.setView(location)
+        const defaultLocation: L.LatLng = new L.LatLng(51.591, 24.609);
+        const defaultZoom = 5;
+
+        const location = cookieLocation !== undefined ? cookieLocation.location : defaultLocation
+        const zoom = cookieLocation !== undefined ? cookieLocation.zoom : defaultZoom
+
+        map.setView(location, zoom)
     }
 
     tileLayers.mapnik.addTo(map)
 
-    // @ts-ignore
-    L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map)
+    // Getting
+    // Uncaught TypeError: leaflet__WEBPACK_IMPORTED_MODULE_0___default(...).control.locate =
+    // is not a function
+    // L.control.locate({ drawCircle: false, drawMarker: true }).addTo(map)
 
     new GithubControl({ position: 'bottomright' }).addTo(map)
         .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
@@ -108,9 +115,8 @@ export function initMap() {
     // @ts-ignore
     map.on('click', closeLaneInfo)
 
-    // @ts-ignore
-    // eslint-disable-next-line no-new
-    new L.Hash(map)
+    // TODO: Wasn't loading
+    // const hash = new L.Hash(map)
 
     return map
 }
