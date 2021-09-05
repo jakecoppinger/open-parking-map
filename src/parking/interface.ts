@@ -41,6 +41,7 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
+import { ParkingLanes } from '../utils/interfaces'
 
 const editorName = 'OpenParkingMap.com'
 const version = '0.1.0'
@@ -152,7 +153,7 @@ function handleDatetimeChange(newDatetime: Date) {
     updateLaneColorsByDate(lanes, datetime)
 }
 
-const lanes = {}
+const lanes: ParkingLanes = {}
 const markers = {}
 
 async function downloadParkinkLanes(map: L.Map) {
@@ -166,21 +167,18 @@ async function downloadParkinkLanes(map: L.Map) {
         return
     }
 
-    // @ts-ignore
     for (const way of Object.values(newData.ways).filter(x => x.tags?.highway)) {
-        // @ts-ignore
         if (lanes['right' + way.id] || lanes['left' + way.id] || lanes['empty' + way.id])
             continue
 
         const newLanes = parseParkingLane(way, newData.nodes, map.getZoom(), editorMode)
-        if(newLanes === undefined) {
-            continue;
+        if(newLanes !== undefined) {
+            addNewLanes(newLanes, map)
         }
-        addNewLanes(newLanes, map)
     }
 }
 
-function addNewLanes(newLanes: any, map: L.Map) {
+function addNewLanes(newLanes: ParkingLanes, map: L.Map) {
     updateLaneColorsByDate(newLanes, datetime)
     Object.assign(lanes, newLanes)
     for (const newLane of Object.values(newLanes)) {
