@@ -23,6 +23,7 @@ import { hyper } from 'hyperhtml/esm'
 
 import DatetimeControl from './controls/datetime'
 import GithubControl from './controls/github'
+import AuthorControl from './controls/author'
 import LegendControl from './controls/legend'
 import LaneInfoControl from './controls/lane-info'
 
@@ -42,8 +43,8 @@ import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
 import { OurWindow, OverpassTurboResponse, ParkingLanes, OSMWay } from '../utils/interfaces'
 
-const editorName = 'PLanes'
-const version = '0.4.2'
+const editorName = 'OpenParkingMap.com'
+const version = '0.1.0'
 
 let editorMode = false
 const useDevServer = false
@@ -81,8 +82,8 @@ export function initMap() {
 
     if (document.location.href.indexOf('#') === -1) {
         const cookieLocation = getLocationFromCookie();
-        const defaultLocation: L.LatLng = new L.LatLng(51.591, 24.609);
-        const defaultZoom = 5;
+        const defaultLocation: L.LatLng = new L.LatLng(-33.89184, 151.20283);
+        const defaultZoom = 17;
 
         const location = cookieLocation !== undefined ? cookieLocation.location : defaultLocation
         const zoom = cookieLocation !== undefined ? cookieLocation.zoom : defaultZoom
@@ -96,7 +97,8 @@ export function initMap() {
 
     new GithubControl({ position: 'bottomright' }).addTo(map)
         .setEditorModeCheckboxListener(handleEditorModeCheckboxChange)
-    new LegendControl({ position: 'bottomright' }).addTo(map)
+    new AuthorControl({ position: 'bottomleft' }).addTo(map)
+    new LegendControl({ position: 'bottomleft' }).addTo(map)
     new DatetimeControl({ position: 'topright' }).addTo(map)
         .setDatetime(datetime)
         .setDatetimeChangeListener(handleDatetimeChange)

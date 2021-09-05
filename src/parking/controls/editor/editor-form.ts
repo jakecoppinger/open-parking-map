@@ -74,7 +74,15 @@ function getSideGroup(osm: OSMWay, side: string) {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
-            ${getPresetSigns(osm, side)}
+            <div>
+                <span><b>Russia</b></span>
+                ${getPresetSigns(osm, side, 'russia')}
+            </div>
+            <div>
+                <span><b>Australia</b></span>
+                ${getPresetSigns(osm, side, 'australia')}
+            </div>
+
             <table>
                 ${getTagInputs(osm, side)}
             </table>
@@ -85,10 +93,13 @@ const parkingLaneTagTemplates = [
     'parking:lane:{side}',
     'parking:lane:{side}:{type}',
     'parking:condition:{side}',
-    'parking:condition:{side}:time_interval',
     'parking:condition:{side}:default',
+    'parking:condition:{side}:time_interval',
     'parking:condition:{side}:maxstay',
     'parking:condition:{side}:capacity',
+    'parking:condition:{side}:residents',
+    'parking:condition:{side}:disc:time_interval',
+    'parking:condition:{side}:disc:maxstay',
 ]
 
 function getTagInputs(osm: OSMWay, side: string) {
@@ -104,8 +115,9 @@ function getTagInput(osm: OSMWay, side: string, parkingType: any, tagTemplate: a
         .replace('{side}', side)
         .replace('{type}', parkingType)
 
-    const tagSplit = tag.split(':')
-    const label = tagSplit[Math.floor(tagSplit.length / 2) * 2 - 1]
+    // Show the entire tag. If we cut by `:` then tags with multiple
+    // `:` aren't shown correctly.
+    const label = tag
 
     const value = osm.tags[tag]
 
@@ -138,9 +150,8 @@ function getTagInput(osm: OSMWay, side: string, parkingType: any, tagTemplate: a
 
         case 'parking:condition:{side}:default': {
             input = getTextInput(tag, value)
-            const timeIntervalTag = 'parking:condition:{side}:time_interval'
-                .replace('{side}', side)
-            hide = !osm.tags[timeIntervalTag]
+            // Don't hide this even if time_interval is showing -
+            // the default is still important
             break
         }
         case 'parking:condition:{side}:maxstay': {
@@ -189,22 +200,27 @@ function getSelectInput(tag: string, value: any, values: any[]):HTMLSelectElemen
 }
 
 function getTextInput(tag: string, value: any): HTMLInputElement {
+    const placeholder = tag.includes(':residents') ? '* for any OR permit #' : tag
+
     return hyper`
         <input type="text" 
-               placeholder="${tag}"
+               placeholder="${placeholder}"
                name="${tag}"
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm: OSMWay, side: any) {
-    return presets.map(x => hyper`
-        <img src=${x.img.src}
-             class="sign-preset"
-             height=${x.img.height}
-             width=${x.img.width}
-             alt=${x.img.alt}
-             title=${x.img.title}
-             onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
+function getPresetSigns(osm: OSMWay, side: any, country: 'russia' | 'australia') {
+    return presets
+    // Filter signs by that country
+        .filter(preset => preset.country === country)
+        .map(x => hyper`
+            <img src=${x.img.src}
+                class="sign-preset"
+                height=${x.img.height}
+                width=${x.img.width}
+                alt=${x.img.alt}
+                title=${x.img.title}
+                onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
 function handlePresetClick(tags: any, osm: OSMWay, side: any) {

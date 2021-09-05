@@ -51,7 +51,7 @@ export default L.Control.extend({
 function getPanel(osm: OSMWay, body: any) {
     return hyper`
         <div>
-            <div style="min-width:250px">
+            <div style="min-width:300px">
                 <a href="https://openstreetmap.org/way/${osm.id}" target="_blank">View in OSM</a>
                 <span style="float:right">
                     Edit: 
