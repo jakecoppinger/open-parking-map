@@ -1,8 +1,8 @@
 import { hyper } from 'hyperhtml/esm'
-import { OSMWay } from '../../../utils/interfaces'
+import { OsmKeyValue, OsmWay, SupportedCountryPreset } from '../../../utils/interfaces'
 import { presets } from './presets'
 
-export function getLaneEditForm(osm: OSMWay, waysInRelation: any, cutLaneListener: any) {
+export function getLaneEditForm(osm: OsmWay, waysInRelation: any, cutLaneListener: any) {
     const form = hyper`
         <form id="${osm.id}"
               class="editor-form">
@@ -70,7 +70,7 @@ function handleSideSwitcherChange(e: Event) {
     }
 }
 
-function getSideGroup(osm: OSMWay, side: string) {
+function getSideGroup(osm: OsmWay, side: 'both'|'left'|'right') {
     return hyper`
         <div id=${side}
              class="tags-block_${side}">
@@ -102,7 +102,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:disc:maxstay',
 ]
 
-function getTagInputs(osm: OSMWay, side: string) {
+function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
     const inputs = []
     const type = osm.tags[`parking:lane:${side}`] || 'type'
     for (const tagTemplate of parkingLaneTagTemplates)
@@ -110,7 +110,7 @@ function getTagInputs(osm: OSMWay, side: string) {
     return inputs
 }
 
-function getTagInput(osm: OSMWay, side: string, parkingType: any, tagTemplate: any) {
+function getTagInput(osm: OsmWay, side: string, parkingType: any, tagTemplate: any) {
     const tag = tagTemplate
         .replace('{side}', side)
         .replace('{type}', parkingType)
@@ -209,7 +209,7 @@ function getTextInput(tag: string, value: any): HTMLInputElement {
                value="${value != null ? value : ''}">`
 }
 
-function getPresetSigns(osm: OSMWay, side: any, country: 'russia' | 'australia') {
+function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right', country: SupportedCountryPreset) {
     return presets
     // Filter signs by that country
         .filter(preset => preset.country === country)
@@ -223,14 +223,34 @@ function getPresetSigns(osm: OSMWay, side: any, country: 'russia' | 'australia')
                 onclick=${() => handlePresetClick(x.tags, osm, side)}>`)
 }
 
-function handlePresetClick(tags: any, osm: OSMWay, side: any) {
+/**
+ * Set the content of all the select and input elements in the form when clicking on a preset.
+ * @param tags An array of objects containing an OSM key and corresponding value for the preset
+ * @param osm The OSM way we have selected
+ * @param side What side of the OSM way we are applying this preset to
+ */
+function handlePresetClick(
+        tags: OsmKeyValue[], osm: OsmWay, side: 'both' | 'left' | 'right'
+    ): void {
     for (const tag of tags) {
-        // @ts-ignore
-        document.getElementById(osm.id)[tag.k.replace('{side}', side)].value = tag.v
+        // The id of the form is the OSM way ID
+        const formElement = document.getElementById(osm.id.toString()) as HTMLFormElement;
+
+        // Replace the placeholder `{side}` in the key with the actual side
+        const osmTagKey = tag.k.replace('{side}', side);
+
+        // Some controls are selects, some are textboxes
+        const inputSelector = `form[id='${osm.id}'] [name='${osmTagKey}']`;
+        const currentInput = document.querySelector(inputSelector) as
+            HTMLInputElement | HTMLSelectElement;
+
+        // Set the textbox/select content
+        currentInput.value = tag.v
     }
 
-    // @ts-ignore
-    document.getElementById(osm.id)['parking:lane:' + side].dispatchEvent(new Event('change'))
+    const inputSelector = `form[id='${osm.id}'] [name='${`parking:lane:` + side}']`;
+    const element = document.querySelector(inputSelector) as HTMLInputElement | HTMLSelectElement;
+    element.dispatchEvent(new Event('change'))
 }
 
 function handleLaneTagInput() {
@@ -327,7 +347,7 @@ export function setOsmChangeListener(listener: any) {
     osmChangeListener = listener
 }
 
-function formToOsmWay(osm: OSMWay, form: HTMLInputElement[]) {
+function formToOsmWay(osm: OsmWay, form: HTMLInputElement[]) {
     const regex = /^parking:/
 
     const supprtedTags = parkingLaneTagTemplates

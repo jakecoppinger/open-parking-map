@@ -9,7 +9,9 @@ const ausSignWidth = 30
 const ausSignAspectRatio = 60 / 100
 const ausSignHeight = ausSignWidth / ausSignAspectRatio
 
-export const presets = [
+import { Preset } from "../../../utils/interfaces";
+
+export const presets: Preset[] = [
     {
         country: 'australia',
         key: 'noStoppingAus',
@@ -70,9 +72,6 @@ export const presets = [
             alt: '1P free parking during day, unlimited otherwise',
             title: '1P free parking during day, unlimited otherwise',
         },
-        click: {
-            showTypeButtons: true,
-        },
     },
     {
         country: 'australia',
@@ -93,9 +92,6 @@ export const presets = [
             alt: '1P Parking',
             title: '1P free parking',
         },
-        click: {
-            showTypeButtons: true,
-        },
     },
     {
         country: 'australia',
@@ -115,9 +111,6 @@ export const presets = [
             width: ausSignWidth,
             alt: '2P free parking during weekday daytime, permit excepted',
             title: '2P free parking during weekday daytime, permit excepted',
-        },
-        click: {
-            showTypeButtons: true,
         },
     },
     {
@@ -219,9 +212,6 @@ export const presets = [
             alt: 'Free Parking Sign',
             title: 'Free Parking',
         },
-        click: {
-            showTypeButtons: true,
-        },
     },
     {
         country: 'russia',
@@ -241,9 +231,6 @@ export const presets = [
             width: 40,
             alt: 'Paid Parking Sign',
             title: 'Paid Parking',
-        },
-        click: {
-            showTypeButtons: true,
         },
     },
 ]

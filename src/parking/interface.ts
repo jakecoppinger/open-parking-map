@@ -41,7 +41,7 @@ import { downloadBbox, osmData, resetLastBounds } from '../utils/data-client'
 import { getUrl } from './data-url'
 import { addChangedEntity, changesStore } from '../utils/changes-store'
 import { authenticate, logout, userInfo, uploadChanges } from '../utils/osm-client'
-import { OurWindow, OverpassTurboResponse, ParkingLanes, OSMWay } from '../utils/interfaces'
+import { OurWindow, OverpassTurboResponse, ParkingLanes, OsmWay } from '../utils/interfaces'
 
 const editorName = 'OpenParkingMap.com'
 const version = '0.1.0'
@@ -192,7 +192,7 @@ function handleLaneClick(e: Event) {
 
     // I don't know where this gets set, but it appears to be a way
     // @ts-ignore
-    const osm: OSMWay = e.target.options.osm;
+    const osm: OsmWay = e.target.options.osm;
 
     const osmId = osm.id
     const lane = lanes['right' + osmId] || lanes['left' + osmId] || lanes['empty' + osmId]
@@ -300,7 +300,7 @@ async function handleEditorModeCheckboxChange(e: Event) {
     }
 }
 
-function handleOsmChange(newOsm: OSMWay) {
+function handleOsmChange(newOsm: OsmWay) {
     const {map} = (window as OurWindow);
     const newLanes = parseChangedParkingLane(newOsm, lanes, datetime, map.getZoom())
     newLanes.forEach(lane => lane.addTo(map))
@@ -329,7 +329,7 @@ const cutIcon = L.divIcon({
     html: '✂',
 })
 
-function handleCutLaneClick(osm: OSMWay) {
+function handleCutLaneClick(osm: OsmWay) {
     if (Object.keys(markers).length > 0)
         return
 
