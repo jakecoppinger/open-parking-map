@@ -42,5 +42,9 @@ localhost with the following command:
 
 `ngrok http --host-header=rewrite 33444`
 
+## Typecheck
+
+`yarn run typecheck`
+
 # License
 MIT
