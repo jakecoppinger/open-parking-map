@@ -1,4 +1,3 @@
-
 import ausNoStoppingImg from '../../../signs/no-stopping.jpg'
 import ausNoParkingSign from '../../../signs/no-parking.jpg'
 import aus1pSign from '../../../signs/1p.jpg'
@@ -9,7 +8,7 @@ const ausSignWidth = 30
 const ausSignAspectRatio = 60 / 100
 const ausSignHeight = ausSignWidth / ausSignAspectRatio
 
-import { Preset } from "../../../utils/interfaces";
+import { Preset } from '../../../utils/types/preset'
 
 export const presets: Preset[] = [
     {
