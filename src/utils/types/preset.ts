@@ -4,11 +4,11 @@ export interface OsmKeyValue {
     v: string
 }
 
-export type SupportedCountryPreset = 'australia' | 'russia';
+export type SupportedCountryPreset = 'australia' | 'russia'
 export interface Preset {
     /** Name of this preset */
     key: string
-    country: SupportedCountryPreset;
+    country: SupportedCountryPreset
     tags: OsmKeyValue[]
     img: {
         src: string

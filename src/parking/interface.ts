@@ -86,9 +86,9 @@ export function initMap(): L.Map {
     const map = L.map(root, { fadeAnimation: false })
 
     if (!document.location.href.includes('#')) {
-        const cookieLocation = getLocationFromCookie();
-        const defaultLocation: L.LatLng = new L.LatLng(-33.89184, 151.20283);
-        const defaultZoom = 17;
+        const cookieLocation = getLocationFromCookie()
+        const defaultLocation: L.LatLng = new L.LatLng(-33.89184, 151.20283)
+        const defaultZoom = 17
 
         const location = cookieLocation !== undefined ? cookieLocation.location : defaultLocation
         const zoom = cookieLocation !== undefined ? cookieLocation.zoom : defaultZoom
@@ -121,7 +121,7 @@ export function initMap(): L.Map {
     map.on('click', closeLaneInfo)
     map.on('click', areaInfoControl.closeAreaInfo)
 
-    layersControl.addTo(map);
+    layersControl.addTo(map)
 
     // @ts-expect-error
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
