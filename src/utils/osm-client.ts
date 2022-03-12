@@ -96,6 +96,7 @@ function createChangeset(editorName: string, editorVersion: string): Promise<str
                     { $k: 'created_by', $v: `${editorName} ${editorVersion}` },
                     { $k: 'comment', $v: 'Edit parking lanes using openparkingmap.com' },
                     { $k: 'hashtags', $v: '#openparkingmap' },
+                    { $k: 'host', $v: `${window.location.origin}${window.location.pathname}` },
                 ],
             },
         },

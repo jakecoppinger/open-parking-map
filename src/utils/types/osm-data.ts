@@ -4,10 +4,10 @@ export interface OsmTags {
 
 interface OsmObject {
     id: number
-    uid: number
-    user: string
+    uid?: number
+    user?: string
     /** ISO8601 string */
-    timestamp: string
+    timestamp?: string
     version: number
     changeset: number
     tags: OsmTags
@@ -33,4 +33,10 @@ export type OsmElement = OsmNode | OsmWay | OsmRelation
 
 export interface RawOsmData {
     elements: OsmElement[]
+}
+
+export enum OsmDataSource {
+    OverpassDe,
+    OsmOrg,
+    OverpassVk,
 }

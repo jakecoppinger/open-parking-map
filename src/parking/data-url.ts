@@ -1,5 +1,6 @@
 import L from 'leaflet'
-import { overpassUrl, osmDevUrl } from '../utils/links'
+import { overpassDeUrl, overpassVkUrl, osmProdUrl, osmDevUrl } from '../utils/links'
+import { OsmDataSource } from '../utils/types/osm-data'
 
 /**
  * Get the API request URL (eg. Overpass Turbo query URL *./
@@ -7,14 +8,15 @@ import { overpassUrl, osmDevUrl } from '../utils/links'
  * @param {boolean} editorMode
  * @param {boolean} useDevServer
  */
-export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean): string {
-    if (useDevServer) {
+export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer: boolean, source: OsmDataSource): string {
+    if (editorMode || useDevServer || source === OsmDataSource.OsmOrg) {
         const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()].join(',')
-        return osmDevUrl + '/api/0.6/map?bbox=' + bbox
+        return (useDevServer ? osmDevUrl : osmProdUrl) + '/api/0.6/map?bbox=' + bbox
     } else {
-        const overpassQuery = editorMode ?
-            getOverpassEditorQuery(bounds).replace(/\s+/g, ' ') :
-            getOverpassViewerQuery(bounds).replace(/\s+/g, ' ')
+        const overpassUrl = source === OsmDataSource.OverpassDe ?
+            overpassDeUrl :
+            overpassVkUrl
+        const overpassQuery = getOverpassViewerQuery(bounds).replace(/\s+/g, ' ')
         return overpassUrl + encodeURIComponent(overpassQuery)
     }
 }
@@ -38,6 +40,7 @@ function getOverpassViewerQuery(bounds: L.LatLngBounds) {
         [out:json];
         (
             way[highway][~"^parking:.*"~"."](${convertBoundsToOverpassBbox(bounds)});
+            way[amenity=parking](${convertBoundsToOverpassBbox(bounds)});
         )->.a;
         (
             .a;

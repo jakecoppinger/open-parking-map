@@ -3,7 +3,7 @@ import { hyper } from 'hyperhtml/esm'
 import { legend } from '../legend'
 
 export default L.Control.extend({
-    onAdd: (map: L.Map) => hyper`
+    onAdd: () => hyper`
         <div id="legend"
              class="leaflet-control-layers control-padding control-bigfont"
              onmouseenter=${handleLegendMouseEnter}
@@ -38,7 +38,9 @@ function handleLegendMouseLeave(e: Event) {
 
 function setLegendBody(el: Element) {
     el.innerHTML = legend
-        .map(x => "<div class='legend-element' style='background-color:" + x.color + ";'></div> " + x.text)
+        .map(x => `<div class='legend-element' style='background-color:${x.color};'></div>
+            <span title="parking:condition:<Side>=${x.condition}">${x.text}</span>
+            `)
         .join('<br />')
 }
 

@@ -3,10 +3,10 @@ import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hour
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
-import { ConditionColor, ConditionsInterface } from '../utils/types/conditions'
+import { ConditionColor, ConditionInterface, ConditionsInterface } from '../utils/types/conditions'
 import { OsmWay, OsmTags } from '../utils/types/osm-data'
 import { ParkingLanes, Side } from '../utils/types/parking'
-import { MyPolylineOptions } from '../utils/types/leaflet'
+import { ParkingPolylineOptions } from '../utils/types/leaflet'
 
 const highwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street/
 const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential/
@@ -45,7 +45,7 @@ export function parseParkingLane(
         way.tags.highway &&
         highwayRegex.test(way.tags.highway)) {
         const laneId = generateLaneId(way)
-        const leafletPolyline = createPolyline(polyline, {}, 'right', way, 0, isMajor, zoom)
+        const leafletPolyline = createPolyline(polyline, undefined, 'right', way, 0, isMajor, zoom)
         lanes[laneId] = leafletPolyline
     }
 
@@ -84,7 +84,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
         if (!lanes['empty' + newOsm.id]) {
             const isMajor = wayIsMajor(newOsm.tags)
             const laneId = generateLaneId(newOsm)
-            const leafletPolyline = createPolyline(polyline, {}, 'right', newOsm, 0, isMajor, zoom)
+            const leafletPolyline = createPolyline(polyline, undefined, 'right', newOsm, 0, isMajor, zoom)
             lanes[laneId] = leafletPolyline
             newLanes.push(leafletPolyline)
         }
@@ -103,16 +103,16 @@ function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: Condi
     return side! + osm.id
 }
 
-function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
-    return L.polyline(line,
-        {
-            color: getColor(conditions?.default),
-            weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
-            offset: side === 'right' ? offset : -offset,
-            conditions: conditions,
-            osm: osm,
-            isMajor: isMajor,
-        } as MyPolylineOptions)
+function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface | undefined, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
+    const polylineOptions: ParkingPolylineOptions = {
+        color: getColor(conditions?.default),
+        weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
+        offset: side === 'right' ? offset : -offset,
+        conditions,
+        osm,
+        isMajor,
+    }
+    return L.polyline(line, polylineOptions)
 }
 
 function getColor(condition: string | null | undefined): ConditionColor | undefined {
@@ -129,22 +129,41 @@ function wayIsMajor(tags: OsmTags) {
     return tags.highway.search(majorHighwayRegex) >= 0
 }
 
-function getConditions(side: 'left' | 'right', tags: { [key: string]: string }): ConditionsInterface {
+function getConditions(side: 'left' | 'right', tags: OsmTags): ConditionsInterface {
     const conditions: ConditionsInterface = { intervals: [], default: null }
+
+    conditions.intervals = parseConditionsByOldScheme(side, tags)
+    conditions.default = parseDefaultCondition(side, tags, conditions.intervals.length)
+
+    return conditions
+}
+
+function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount: number) {
+    const sides = [side, 'both']
+
+    const laneTag = sides.map(side => 'parking:lane:' + side).find(tag => tags[tag])
+    const conditionTag = sides.map(side => 'parking:condition:' + side).find(tag => tags[tag])
+    const defalutConditionTag = sides.map(side => 'parking:condition:' + side + ':default').find(tag => tags[tag])
+
+    const tag = findedIntervalsCount === 0 ?
+        conditionTag ?? (laneTag && legend.some(x => x.condition === tags[laneTag]) ? laneTag : null) ?? defalutConditionTag :
+        defalutConditionTag ?? laneTag
+    const condition = tag ? tags[tag] : null
+    const conditionInLegend = condition ? legend.some(x => x.condition === condition) : false
+
+    if (conditionInLegend)
+        return condition
+
+    if (!conditionInLegend && laneTag &&
+        ['parallel', 'diagonal', 'perpendicular', 'marked', 'yes'].includes(tags[laneTag]))
+        return 'free'
+
+    return null
+}
+
+function parseConditionsByOldScheme(side: string, tags: OsmTags) {
+    const intervals: ConditionInterface[] = []
     const sides = ['both', side]
-
-    const defaultTags = sides.map(side => 'parking:condition:' + side + ':default')
-        .concat(sides.map(side => 'parking:lane:' + side))
-
-    let findResult: string
-    for (const tag of defaultTags) {
-        findResult = tags[tag]
-        if (findResult)
-            conditions.default = findResult
-
-        if (conditions.default)
-            break
-    }
 
     for (let i = 1; i < 10; i++) {
         const index = i > 1 ? ':' + i : ''
@@ -153,40 +172,32 @@ function getConditions(side: 'left' | 'right', tags: { [key: string]: string }):
         const conditionTags = sides.map(side => 'parking:condition:' + side + index)
         const intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval')
 
-        const cond: any = {}
+        const cond: ConditionInterface = { condition: null, interval: null }
 
         for (let j = 0; j < sides.length; j++) {
-            findResult = tags[laneTags[j]]
-            if (findResult && legend.findIndex(x => x.condition === findResult) >= 0)
-                cond.condition = findResult
+            let tagValue = tags[laneTags[j]]
+            if (tagValue && legend.findIndex(x => x.condition === tagValue) >= 0)
+                cond.condition = tagValue
 
-            findResult = tags[conditionTags[j]]
-            if (findResult)
-                cond.condition = findResult
+            tagValue = tags[conditionTags[j]]
+            if (tagValue)
+                cond.condition = tagValue
 
-            findResult = tags[intervalTags[j]]
-            if (findResult)
-                cond.interval = parseOpeningHourse(findResult)
+            tagValue = tags[intervalTags[j]]
+            if (tagValue)
+                cond.interval = parseOpeningHourse(tagValue)
         }
 
-        if (i === 1 && cond.interval == null) {
-            if ('condition' in cond)
-                conditions.default = cond.condition
-
+        if (i === 1 && cond.interval == null)
             break
-        }
 
-        if ('condition' in cond)
-            // @ts-expect-error
-            conditions.intervals[i - 1] = cond
+        if (cond.condition)
+            intervals?.push(cond)
         else
             break
     }
 
-    if (legend.findIndex(x => x.condition === conditions.default) === -1)
-        conditions.default = null
-
-    return conditions
+    return intervals
 }
 
 /** The time effects the current parking restrictions. Update colors based on this. */
@@ -198,8 +209,7 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
 }
 
 function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
-    // Is object empty?
-    if (Object.keys(conditions).length === 0)
+    if (!conditions)
         return 'black'
 
     // If conditions.intervals not defined, return the default color
@@ -239,19 +249,21 @@ export function getBacklights(polyline: L.LatLngExpression[], zoom: number): { r
 
     return {
         right: L.polyline(polyline,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
-                color: 'fuchsia',
+                color: '#e66101',
                 weight: (laneStyle[zoom].offsetMajor ?? 1) * n - 4,
                 offset: (laneStyle[zoom].offsetMajor ?? 1) * n,
                 opacity: 0.4,
-            } as MyPolylineOptions),
+            } as ParkingPolylineOptions),
 
         left: L.polyline(polyline,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             {
-                color: 'cyan',
+                color: '#5e3c99',
                 weight: (laneStyle[zoom].offsetMajor ?? 0.5) * n - 4,
                 offset: -(laneStyle[zoom].offsetMajor ?? 0.5) * n,
                 opacity: 0.4,
-            } as MyPolylineOptions),
+            } as ParkingPolylineOptions),
     }
 }
