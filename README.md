@@ -33,9 +33,8 @@ threshold. I've added a debounce function but it still crops up.
 Open your browser console to look for errors. PRs welcome to surface these errors in the UI.
 
 # Local Development
-- Install yarn: see https://classic.yarnpkg.com/en/docs/install/
-- Install dependencies: `yarn install`
-- Start Webpack dev server: `yarn run start`
+- Install dependencies: `npm i`
+- Start Webpack dev server: `npm run start`
 
 Geolocation won't work over http. [ngrok](https://ngrok.com/docs) can start an HTTPS tunnel to your
 localhost with the following command:
@@ -44,7 +43,7 @@ localhost with the following command:
 
 ## Typecheck
 
-`yarn run typecheck`
+`npm run typecheck`
 
 # License
 MIT
