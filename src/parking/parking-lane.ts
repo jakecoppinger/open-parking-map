@@ -3,10 +3,11 @@ import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hour
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
-import { ConditionColor, ConditionInterface, ConditionsInterface } from '../utils/types/conditions'
+import { ConditionColor, ConditionalParkingCondition, ParkingConditions } from '../utils/types/conditions'
 import { OsmWay, OsmTags } from '../utils/types/osm-data'
 import { ParkingLanes, Side } from '../utils/types/parking'
 import { ParkingPolylineOptions } from '../utils/types/leaflet'
+import { parseConditionalTag } from '../utils/conditional-tag'
 
 const highwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street/
 const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential/
@@ -30,7 +31,7 @@ export function parseParkingLane(
 
     for (const side of ['right', 'left'] as Side[]) {
         const conditions = getConditions(side, way.tags)
-        if (conditions.default != null || (conditions.intervals && conditions.intervals.length > 0)) {
+        if (conditions.default != null || (conditions.conditionalValues && conditions.conditionalValues.length > 0)) {
             const laneId = generateLaneId(way, side, conditions)
             const offset: number = isMajor ?
                 laneStyle[zoom].offsetMajor as number :
@@ -96,14 +97,14 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
     return newLanes
 }
 
-function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: ConditionsInterface) {
+function generateLaneId(osm: OsmWay, side?: 'left' | 'right', conditions?: ParkingConditions) {
     if (!conditions)
         return 'empty' + osm.id
 
     return side! + osm.id
 }
 
-function createPolyline(line: L.LatLngLiteral[], conditions: ConditionsInterface | undefined, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
+function createPolyline(line: L.LatLngLiteral[], conditions: ParkingConditions | undefined, side: string, osm: OsmWay, offset: number, isMajor: boolean, zoom: number) {
     const polylineOptions: ParkingPolylineOptions = {
         color: getColor(conditions?.default),
         weight: isMajor ? laneStyle[zoom].weightMajor : laneStyle[zoom].weightMinor,
@@ -129,23 +130,27 @@ function wayIsMajor(tags: OsmTags) {
     return tags.highway.search(majorHighwayRegex) >= 0
 }
 
-function getConditions(side: 'left' | 'right', tags: OsmTags): ConditionsInterface {
-    const conditions: ConditionsInterface = { intervals: [], default: null }
+function getConditions(side: 'left' | 'right', tags: OsmTags): ParkingConditions {
+    const conditions: ParkingConditions = { conditionalValues: [], default: null }
 
-    conditions.intervals = parseConditionsByOldScheme(side, tags)
-    conditions.default = parseDefaultCondition(side, tags, conditions.intervals.length)
-
+    conditions.conditionalValues = parseConditionsByNewScheme(side, tags)
+    if (conditions.conditionalValues.length > 0) {
+        conditions.default = parseDefaultCondition(side, tags, 0)
+    } else {
+        conditions.conditionalValues = parseConditionsByOldScheme(side, tags)
+        conditions.default = parseDefaultCondition(side, tags, conditions.conditionalValues.length)
+    }
     return conditions
 }
 
-function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount: number) {
+function parseDefaultCondition(side: string, tags: OsmTags, findedByOldSchemeIntervalsCount: number) {
     const sides = [side, 'both']
 
     const laneTag = sides.map(side => 'parking:lane:' + side).find(tag => tags[tag])
     const conditionTag = sides.map(side => 'parking:condition:' + side).find(tag => tags[tag])
     const defalutConditionTag = sides.map(side => 'parking:condition:' + side + ':default').find(tag => tags[tag])
 
-    const tag = findedIntervalsCount === 0 ?
+    const tag = findedByOldSchemeIntervalsCount === 0 ?
         conditionTag ?? (laneTag && legend.some(x => x.condition === tags[laneTag]) ? laneTag : null) ?? defalutConditionTag :
         defalutConditionTag ?? laneTag
     const condition = tag ? tags[tag] : null
@@ -161,8 +166,25 @@ function parseDefaultCondition(side: string, tags: OsmTags, findedIntervalsCount
     return null
 }
 
+function parseConditionsByNewScheme(side: string, tags: OsmTags) {
+    const conditionalTag = [side, 'both']
+        .map(side => 'parking:condition:' + side + ':conditional')
+        .find(tag => tags[tag])
+
+    if (!conditionalTag)
+        return []
+
+    const intervals: ConditionalParkingCondition[] = parseConditionalTag(tags[conditionalTag])
+        .map(x => ({
+            parkingCondition: x.value,
+            condition: parseOpeningHourse(x.condition),
+        }))
+
+    return intervals
+}
+
 function parseConditionsByOldScheme(side: string, tags: OsmTags) {
-    const intervals: ConditionInterface[] = []
+    const conditionalParkingConditions: ConditionalParkingCondition[] = []
     const sides = ['both', side]
 
     for (let i = 1; i < 10; i++) {
@@ -172,32 +194,32 @@ function parseConditionsByOldScheme(side: string, tags: OsmTags) {
         const conditionTags = sides.map(side => 'parking:condition:' + side + index)
         const intervalTags = sides.map(side => 'parking:condition:' + side + index + ':time_interval')
 
-        const cond: ConditionInterface = { condition: null, interval: null }
+        const conditionalParkingCondition: ConditionalParkingCondition = { parkingCondition: null, condition: null }
 
         for (let j = 0; j < sides.length; j++) {
             let tagValue = tags[laneTags[j]]
             if (tagValue && legend.findIndex(x => x.condition === tagValue) >= 0)
-                cond.condition = tagValue
+                conditionalParkingCondition.parkingCondition = tagValue
 
             tagValue = tags[conditionTags[j]]
             if (tagValue)
-                cond.condition = tagValue
+                conditionalParkingCondition.parkingCondition = tagValue
 
             tagValue = tags[intervalTags[j]]
             if (tagValue)
-                cond.interval = parseOpeningHourse(tagValue)
+                conditionalParkingCondition.condition = parseOpeningHourse(tagValue)
         }
 
-        if (i === 1 && cond.interval == null)
+        if (i === 1 && conditionalParkingCondition.condition == null)
             break
 
-        if (cond.condition)
-            intervals?.push(cond)
+        if (conditionalParkingCondition.parkingCondition)
+            conditionalParkingConditions?.push(conditionalParkingCondition)
         else
             break
     }
 
-    return intervals
+    return conditionalParkingConditions
 }
 
 /** The time effects the current parking restrictions. Update colors based on this. */
@@ -208,16 +230,16 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
     }
 }
 
-function getColorByDate(conditions: ConditionsInterface, datetime: Date): ConditionColor | undefined {
-    if (!conditions)
+function getColorByDate(parkingConditions: ParkingConditions, datetime: Date): ConditionColor | undefined {
+    if (!parkingConditions)
         return 'black'
 
     // If conditions.intervals not defined, return the default color
-    for (const interval of conditions.intervals ?? []) {
-        if (interval.interval && getOpeningHourseState(interval.interval, datetime))
-            return getColor(interval.condition)
+    for (const conditionalValue of parkingConditions.conditionalValues ?? []) {
+        if (conditionalValue.condition && getOpeningHourseState(conditionalValue.condition, datetime))
+            return getColor(conditionalValue.parkingCondition)
     }
-    return getColor(conditions.default)
+    return getColor(parkingConditions.default)
 }
 
 export function updateLaneStylesByZoom(lanes: ParkingLanes, zoom: number): void {
