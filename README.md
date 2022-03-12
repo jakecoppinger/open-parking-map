@@ -32,6 +32,17 @@ threshold. I've added a debounce function but it still crops up.
 
 Open your browser console to look for errors. PRs welcome to surface these errors in the UI.
 
+# Using correct Node version
+The correct Node version is specified in `.nvmrc`.
+
+For an easy way to automatically use this Node version just for your current shell:
+
+- Install `nvm`
+  - Using the [install script]https://github.com/nvm-sh/nvm#install--update-script)
+  - Or using [Homebrew](https://formulae.brew.sh/formula/nvm)
+- Run `nvm use` to automatically use the Node version specified in the `.nvmrc`. You may need to
+  `nvm install`.
+
 # Local Development
 - Install dependencies: `npm i`
 - Run `npm run prepare`. This will install [Husky](https://github.com/typicode/husky), which will automatically run the command in `.husky/pre-commit` before commiting.
