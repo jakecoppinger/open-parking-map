@@ -3,25 +3,25 @@ import ausNoParkingSign from '../../../signs/no-parking.jpg'
 import aus1pSign from '../../../signs/1p.jpg'
 import aus1pDuringDaySign from '../../../signs/1p-during-day.jpg'
 import aus2pPermitSign from '../../../signs/2p-permit.png'
+import aus2pTicket from '../../../signs/2p-ticket.jpg'
+import { Preset } from '../../../utils/types/preset'
+
 
 const ausSignWidth = 30
 const ausSignAspectRatio = 60 / 100
 const ausSignHeight = ausSignWidth / ausSignAspectRatio
 
-import { Preset } from '../../../utils/types/preset'
 
 export const presets: Preset[] = [
     {
         country: 'australia',
         key: 'noStoppingAus',
         tags: [
-            { k: 'parking:lane:{side}', v: 'no_stopping' },
-            { k: 'parking:condition:{side}', v: '' },
-            { k: 'parking:condition:{side}:time_interval', v: '' },
-            { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
-            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
+            { k: 'parking:condition:{side}', v: 'no_stopping' },
+            { k: 'parking:condition:{side}:conditional', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '' },
         ],
         img: {
             src: ausNoStoppingImg,
@@ -35,13 +35,11 @@ export const presets: Preset[] = [
         country: 'australia',
         key: 'noParkingAus',
         tags: [
-            { k: 'parking:lane:{side}', v: 'no_parking' },
-            { k: 'parking:condition:{side}', v: '' },
-            { k: 'parking:condition:{side}:time_interval', v: '' },
-            { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '' },
-            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
+            { k: 'parking:condition:{side}', v: 'no_parking' },
+            { k: 'parking:condition:{side}:conditional', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
             { k: 'parking:condition:{side}:residents', v: '' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '' },
         ],
         img: {
             src: ausNoParkingSign,
@@ -55,13 +53,11 @@ export const presets: Preset[] = [
         country: 'australia',
         key: '1p-during-day',
         tags: [
-            { k: 'parking:lane:{side}', v: '' },
-            { k: 'parking:condition:{side}', v: 'disc' },
-            { k: 'parking:condition:{side}:time_interval', v: '' },
-            { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '1 hour' },
-            { k: 'parking:condition:{side}:disc:time_interval', v: 'Mo-Fr 09:30-17:30; Sa 09:00-12:00' },
+            { k: 'parking:condition:{side}', v: 'free' },
+            { k: 'parking:condition:{side}:conditional', v: 'ticket @ (Mo-Fr 09:00-17:30); ticket @ (Sa 09:00-12:00)' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '1 hour @ (Mo-Fr 09:00-17:30); 1 hours @ (Sa 09:00-12:00)' },
             { k: 'parking:condition:{side}:residents', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
 
@@ -76,13 +72,12 @@ export const presets: Preset[] = [
         country: 'australia',
         key: '1p',
         tags: [
-            { k: 'parking:lane:{side}', v: '' },
-            { k: 'parking:condition:{side}', v: 'disc' },
-            { k: 'parking:condition:{side}:time_interval', v: '' },
-            { k: 'parking:condition:{side}:default', v: '' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '1 hour' },
-            { k: 'parking:condition:{side}:disc:time_interval', v: '' },
+            { k: 'parking:condition:{side}', v: 'free' },
+            { k: 'parking:condition:{side}:conditional', v: '' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '1 hour' },
             { k: 'parking:condition:{side}:residents', v: '' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
+
         ],
         img: {
             src: aus1pSign,
@@ -96,16 +91,30 @@ export const presets: Preset[] = [
         country: 'australia',
         key: '2p-residents',
         tags: [
-            { k: 'parking:lane:{side}', v: '' },
-            { k: 'parking:condition:{side}', v: 'disc' },
-            { k: 'parking:condition:{side}:time_interval', v: '' },
-            { k: 'parking:condition:{side}:default', v: 'free' },
-            { k: 'parking:condition:{side}:disc:maxstay', v: '2 hours' },
-            { k: 'parking:condition:{side}:disc:time_interval', v: 'Mo-Fr 08:00-18:00' },
-            { k: 'parking:condition:{side}:residents', v: '*' },
+            { k: 'parking:condition:{side}', v: 'free; residents' },
+            { k: 'parking:condition:{side}:residents', v: 'R1' },
+            { k: 'parking:condition:{side}:conditional', v: '' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '2 hours @ (Mo-Fr 08:00-18:00 AND free)' },
+            { k: 'parking:condition:{side}:maxstay', v: '' },
         ],
         img: {
             src: aus2pPermitSign,
+            height: ausSignHeight,
+            width: ausSignWidth,
+            alt: '2P free parking during weekday daytime, permit excepted',
+            title: '2P free parking during weekday daytime, permit excepted',
+        },
+    },
+    {
+        country: 'australia',
+        key: '2p-ticket',
+        tags: [
+            { k: 'parking:condition:{side}', v: 'free' },
+            { k: 'parking:condition:{side}:conditional', v: 'ticket @ (Mo-Fr 09:00-17:30); ticket @ (Sa 09:00-12:00)' },
+            { k: 'parking:condition:{side}:maxstay:conditional', v: '2 hours @ (Mo-Fr 09:00-17:30); 2 hours @ (Sa 09:00-12:00)' },
+        ],
+        img: {
+            src: aus2pTicket,
             height: ausSignHeight,
             width: ausSignWidth,
             alt: '2P free parking during weekday daytime, permit excepted',

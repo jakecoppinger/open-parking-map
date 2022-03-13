@@ -99,12 +99,10 @@ const parkingLaneTagTemplates = [
     'parking:lane:{side}:{type}',
     'parking:condition:{side}',
     'parking:condition:{side}:conditional',
-    'parking:condition:{side}:time_interval',
-    'parking:condition:{side}:default',
     'parking:condition:{side}:maxstay',
+    'parking:condition:{side}:maxstay:conditional',
     'parking:lane:{side}:capacity',
     'parking:condition:{side}:residents',
-    'parking:lane:{side}:surface',
 ]
 
 function getTagInputs(osm: OsmWay, side: 'both'|'left'|'right') {
@@ -405,6 +403,7 @@ const conditionValues = [
     'no_standing',
     'no_stopping',
     'no',
+    'free; residents',
 ]
 
 let osmChangeListener: (way: OsmWay) => void
