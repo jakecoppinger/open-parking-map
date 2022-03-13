@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "typeRoots" : ["node_modules/@types", "src/types"]
   },
-  "include": ["src/parking/*.ts", "src/utils/*.ts", "src/utils/types/*.ts", "src/types/images.d.ts"]
+  "include": ["src/index.ts", "src/parking/*.ts", "src/utils/*.ts", "src/utils/types/*.ts", "src/types/images.d.ts"]
 }

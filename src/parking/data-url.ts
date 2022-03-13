@@ -21,6 +21,21 @@ export function getUrl(bounds: L.LatLngBounds, editorMode: boolean, useDevServer
     }
 }
 
+// eslint-disable-next-line
+function getOverpassEditorQuery(bounds: L.LatLngBounds) {
+    return `
+        [out:json];
+        (
+            way[highway~"^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street"][service!=parking_aisle](${convertBoundsToOverpassBbox(bounds)});
+        )->.a;
+        (
+            .a;
+            .a >;
+            .a <;
+        );
+        out meta;`
+}
+
 function getOverpassViewerQuery(bounds: L.LatLngBounds) {
     return `
         [out:json];

@@ -97,13 +97,9 @@ const parkingLaneTagTemplates = [
     'parking:lane:{side}',
     'parking:lane:{side}:{type}',
     'parking:condition:{side}',
-    'parking:condition:{side}:default',
-    'parking:condition:{side}:time_interval',
     'parking:condition:{side}:maxstay',
     'parking:lane:{side}:capacity',
     'parking:condition:{side}:residents',
-    'parking:condition:{side}:disc:time_interval',
-    'parking:condition:{side}:disc:maxstay',
     'parking:lane:{side}:surface',
 ]
 
