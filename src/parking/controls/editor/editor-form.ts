@@ -272,9 +272,8 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
         </tr>`
 }
 
-function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right', country: SupportedCountryPreset ) {
+function getPresetSigns(osm: OsmWay, side: 'both'|'left'|'right', country: SupportedCountryPreset) {
     return presets
-        // Filter signs by that country
         .filter(preset => preset.country === country)
         .map(x => hyper`
             <img src=${x.img.src}
