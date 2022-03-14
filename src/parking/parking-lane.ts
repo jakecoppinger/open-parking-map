@@ -65,7 +65,7 @@ export function parseChangedParkingLane(newOsm: OsmWay, lanes: ParkingLanes, dat
         const id = side + newOsm.id
         if (conditions.default != null) {
             if (lanes[id]) {
-                lanes[id].conditions = conditions
+                lanes[id].options.conditions = conditions
                 lanes[id].setStyle({ color: getColorByDate(conditions, datetime) })
             } else {
                 const isMajor = wayIsMajor(newOsm.tags)
@@ -159,7 +159,10 @@ function parseDefaultCondition(side: string, tags: OsmTags, findedByOldSchemeInt
     if (conditionInLegend)
         return condition
 
-    if (!conditionInLegend && laneTag &&
+    if (condition)
+        return 'unsupported'
+
+    if (!condition && laneTag &&
         ['parallel', 'diagonal', 'perpendicular', 'marked', 'yes'].includes(tags[laneTag]))
         return 'free'
 

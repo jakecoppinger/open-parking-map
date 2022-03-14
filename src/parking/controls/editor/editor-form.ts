@@ -192,7 +192,7 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
 
     return hyper`
         <tr id="${tag}"
-            style=${{ display: hide ? 'none' : null }}>
+            style=${{ display: hide && !value ? 'none' : null }}>
             <td><label title="${tag}">${label}</label></td>
             <td>
                 ${input}
@@ -334,7 +334,7 @@ function handleLaneTagInput(e: Event) {
     const surfaceTr = document.getElementById(`parking:lane:${side}:surface`)
     if (['parallel', 'diagonal', 'perpendicular', 'marked', 'yes'].includes(el.value))
         showElement(surfaceTr!.id)
-    else
+    else if (!surfaceTr?.querySelector('input')?.value)
         hideElement(surfaceTr!.id)
 }
 
@@ -343,7 +343,7 @@ function handleConditionTagInput(e: Event) {
     const side = el.name.split(':')[2]
     const maxstayTr = document.getElementById(`parking:condition:${side}:maxstay`)
 
-    if (el.value === 'disc')
+    if (el.value === 'disc' && !maxstayTr?.querySelector('input')?.value)
         hideElement(maxstayTr!.id)
     else
         showElement(maxstayTr!.id)
@@ -358,7 +358,7 @@ function handleTimeIntervalTagInput(e: Event) {
     const side = el.name.split(':')[2]
     const defaultConditionTr = document.getElementById(`parking:condition:${side}:default`)
 
-    if (el.value === '')
+    if (el.value === '' && !defaultConditionTr?.querySelector('input')?.value)
         hideElement(defaultConditionTr!.id)
     else
         showElement(defaultConditionTr!.id)
