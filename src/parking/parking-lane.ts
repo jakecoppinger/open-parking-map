@@ -1,13 +1,14 @@
 import L from 'leaflet'
-import { parseOpeningHourse, getOpeningHourseState } from '../utils/opening-hours'
+import { parseOpeningHours } from '../utils/opening-hours'
 import { legend } from './legend'
 import { laneStyleByZoom as laneStyle } from './lane-styles'
 
-import { ConditionColor, ConditionalParkingCondition, ParkingConditions } from '../utils/types/conditions'
+import { ConditionalParkingCondition, ParkingConditions } from '../utils/types/conditions'
 import { OsmWay, OsmTags } from '../utils/types/osm-data'
 import { ParkingLanes, Side } from '../utils/types/parking'
 import { ParkingPolylineOptions } from '../utils/types/leaflet'
 import { parseConditionalTag } from '../utils/conditional-tag'
+import { getColor, getColorByDate } from './condition-color'
 
 const highwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|living_street/
 const majorHighwayRegex = /^motorway|trunk|primary|secondary|tertiary|unclassified|residential/
@@ -116,16 +117,6 @@ function createPolyline(line: L.LatLngLiteral[], conditions: ParkingConditions |
     return L.polyline(line, polylineOptions)
 }
 
-function getColor(condition: string | null | undefined): ConditionColor | undefined {
-    if (!condition)
-        return undefined
-
-    for (const element of legend) {
-        if (condition === element.condition)
-            return element.color
-    }
-}
-
 function wayIsMajor(tags: OsmTags) {
     return tags.highway.search(majorHighwayRegex) >= 0
 }
@@ -180,7 +171,7 @@ function parseConditionsByNewScheme(side: string, tags: OsmTags) {
     const intervals: ConditionalParkingCondition[] = parseConditionalTag(tags[conditionalTag])
         .map(x => ({
             parkingCondition: x.value,
-            condition: parseOpeningHourse(x.condition),
+            condition: parseOpeningHours(x.condition),
         }))
 
     return intervals
@@ -210,7 +201,7 @@ function parseConditionsByOldScheme(side: string, tags: OsmTags) {
 
             tagValue = tags[intervalTags[j]]
             if (tagValue)
-                conditionalParkingCondition.condition = parseOpeningHourse(tagValue)
+                conditionalParkingCondition.condition = parseOpeningHours(tagValue)
         }
 
         if (i === 1 && conditionalParkingCondition.condition == null)
@@ -231,18 +222,6 @@ export function updateLaneColorsByDate(lanes: ParkingLanes, datetime: Date): voi
         const color = getColorByDate(lanes[lane].options.conditions, datetime)
         lanes[lane].setStyle({ color })
     }
-}
-
-function getColorByDate(parkingConditions: ParkingConditions, datetime: Date): ConditionColor | undefined {
-    if (!parkingConditions)
-        return 'black'
-
-    // If conditions.intervals not defined, return the default color
-    for (const conditionalValue of parkingConditions.conditionalValues ?? []) {
-        if (conditionalValue.condition && getOpeningHourseState(conditionalValue.condition, datetime))
-            return getColor(conditionalValue.parkingCondition)
-    }
-    return getColor(parkingConditions.default)
 }
 
 export function updateLaneStylesByZoom(lanes: ParkingLanes, zoom: number): void {

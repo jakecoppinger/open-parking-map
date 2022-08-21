@@ -101,6 +101,7 @@ const parkingLaneTagTemplates = [
     'parking:condition:{side}:conditional',
     'parking:condition:{side}:time_interval',
     'parking:condition:{side}:default',
+    'parking:condition:{side}:conditional',
     'parking:condition:{side}:maxstay',
     'parking:lane:{side}:capacity',
     'parking:condition:{side}:residents',
@@ -123,6 +124,13 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
     // Show the entire tag. If we cut by `:` then tags with multiple
     // `:` aren't shown correctly.
     const label = tag
+
+    if (tagTemplate === 'parking:condition:{side}:conditional') {
+        const conditionTag = 'parking:condition:{side}'
+            .replace('{side}', side)
+        const hide = !osm.tags[conditionTag]
+        return getConditionalInput(osm, tag, label, hide)
+    }
 
     if (tagTemplate === 'parking:condition:{side}:conditional') {
         const conditionTag = 'parking:condition:{side}'
@@ -172,6 +180,14 @@ function getTagInput(osm: OsmWay, side: string, parkingType: string, tagTemplate
             const conditionTag = 'parking:condition:{side}'
                 .replace('{side}', side)
             hide = osm.tags[conditionTag] !== 'disc'
+            break
+        }
+        case 'parking:lane:{side}:capacity': {
+            input = getTextInput(tag, value)
+            input.placeholder = 'eg. 10'
+            const capacityTags = 'parking:lane:{side}:capacity'
+                .replace('{side}', side)
+            hide = !!capacityTags
             break
         }
         case 'parking:lane:{side}:surface': {
@@ -261,13 +277,14 @@ function getConditionalPartInput(osm: OsmWay, tag: string, part: ConditionalValu
                 ${selectInput}
             </td>
             <td>
-                <input type="text"
+                @
+                (<input type="text"
                        placeholder="time interval"
                        name="${tag}"
                        value="${part.condition}"
                        data-partindex="${partindex}"
                        data-tokenname="time_interval"
-                       oninput=${(e) => handleInputChange(e, osm)}>
+                       oninput=${(e) => handleInputChange(e, osm)}>)
             </td>
         </tr>`
 }
@@ -413,7 +430,7 @@ export function setOsmChangeListener(listener: (way: OsmWay) => void) {
 }
 
 function formToOsmWay(osm: OsmWay, form: HTMLFormElement) {
-    const regex = /^parking:(?!>conditional$)/
+    const regex = /^parking:(?!.*conditional$)/
 
     const supprtedTags = parkingLaneTagTemplates
         .map(x => {

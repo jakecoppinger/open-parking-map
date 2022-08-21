@@ -1,20 +1,27 @@
 {
-  "lib": ["es2017"],
-  "compilerOptions": {
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "lib": ["dom", "es2017"],
-    "target": "es2017",
-    "noImplicitAny": false,
-    "pretty": true,
-    "sourceRoot": "./src/",
-    "rootDir": "./src/",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "skipLibCheck": true,
-    "types": ["node", "jest"],
-    "typeRoots" : ["node_modules/@types", "src/types"]
-  },
-  "include": ["src/index.ts", "src/parking/*.ts", "src/utils/*.ts", "src/utils/types/*.ts", "src/types/images.d.ts", "src/test/*.test.ts"]
+    "lib": ["es2017"],
+    "compilerOptions": {
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "lib": ["dom", "es2017"],
+        "target": "es2017",
+        "noImplicitAny": false,
+        "pretty": true,
+        "sourceRoot": "./src/",
+        "rootDir": "./src/",
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "types": ["node", "jest"],
+        "typeRoots": ["node_modules/@types", "src/types"]
+    },
+    "include": [
+        "src/index.ts",
+        "src/parking/*.ts",
+        "src/utils/*.ts",
+        "src/utils/types/*.ts",
+        "src/types/images.d.ts",
+        "src/test/*.test.ts"
+    ]
 }
